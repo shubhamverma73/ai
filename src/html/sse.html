@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>SSE Chat Demo</title>
+	<link rel="stylesheet" href="../css/style.css" />
+	<link rel="stylesheet" href="../css/code-theme.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-dark.min.css" />
+</head>
+
+<body>
+	<div class="page">
+		<div class="chat-shell">
+			<header class="chat-header">
+				<div class="brand">
+					<div class="brand-badge">E</div>
+					<div class="brand-title">
+						<h1>SSE Chat</h1>
+						<p>EventSource streaming demo</p>
+					</div>
+				</div>
+				<div class="mode-tag">GET + SSE</div>
+			</header>
+
+			<main class="chat-body">
+				<section id="messages" class="messages">
+					<div class="message bot">Hello! Click start and see server-sent events live.</div>
+				</section>
+
+				<section class="composer">
+					<div class="composer-row">
+						<div class="input-wrap">
+							<label for="prompt">Your message</label>
+							<textarea id="prompt" placeholder="Ask something about LangChain or Bhadohi..."
+								required></textarea>
+						</div>
+						<button id="sendBtn" class="primary">Start</button>
+						<button id="clearBtn" class="secondary">Clear</button>
+					</div>
+
+					<div class="meta-row">
+						<div class="status">
+							<span id="spinner" class="spinner"></span>
+							<span id="statusText">Ready</span>
+						</div>
+						<div class="status">Endpoint: <strong>/chat-sse</strong></div>
+					</div>
+				</section>
+			</main>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+	<script>
+		const messages = document.getElementById("messages");
+		const prompt = document.getElementById("prompt");
+		const sendBtn = document.getElementById("sendBtn");
+		const clearBtn = document.getElementById("clearBtn");
+		const spinner = document.getElementById("spinner");
+		const statusText = document.getElementById("statusText");
+
+		let es = null;
+
+		marked.setOptions({
+			breaks: true,
+			gfm: true,
+		});
+
+		const renderMarkdownFinal = (element, text) => {
+			element.innerHTML = marked.parse(text);
+
+			element.querySelectorAll("pre code").forEach((block) => {
+				hljs.highlightElement(block);
+			});
+		};
+
+		const renderStreamingPlainText = (element, text) => {
+			element.textContent = text;
+		};
+
+		const renderMarkdown = (element, text) => {
+			element.innerHTML = marked.parse(text);
+			element.querySelectorAll("pre code").forEach((block) => {
+				hljs.highlightElement(block);
+			});
+		};
+
+		const addMessage = (text, type) => {
+			const div = document.createElement("div");
+			div.className = `message ${type}`;
+
+			if (type === "bot") {
+				renderMarkdown(div, text);
+			} else {
+				div.textContent = text;
+			}
+
+			messages.appendChild(div);
+			messages.scrollTop = messages.scrollHeight;
+			return div;
+		};
+
+		async function startSSE() {
+			const message = prompt.value.trim() || "Explain LangChain in simple Hindi.";
+			const userId = "user_101";
+
+			addMessage(message, "user");
+			const botBubble = addMessage("", "bot");
+			let fullText = "";
+
+			sendBtn.disabled = true;
+			spinner.classList.add("show");
+			statusText.textContent = "Checking...";
+			prompt.value = "";
+
+			try {
+				const usageRes = await fetch(`http://localhost:5000/usage/${userId}`);
+				const usage = await usageRes.json();
+
+				if (usage.remaining <= 0) {
+					throw new Error("Chat limit exceeded for this user");
+				}
+
+				if (es) es.close();
+
+				es = new EventSource(
+					`http://localhost:5000/chat-sse?message=${encodeURIComponent(message)}&userId=${encodeURIComponent(userId)}`
+				);
+
+				es.onopen = () => {
+					statusText.textContent = "Streaming...";
+				};
+
+				es.onmessage = (event) => {
+					console.log("RAW SSE DATA:", event.data);
+
+					let data;
+					try {
+						data = JSON.parse(event.data);
+					} catch (e) {
+						botBubble.textContent = "Error: Invalid SSE response";
+						console.error("Invalid SSE data:", event.data);
+						return;
+					}
+
+					if (data.text) {
+						fullText += data.text;
+						renderStreamingPlainText(botBubble, fullText);
+					}
+
+					if (data.done) {
+						renderMarkdownFinal(botBubble, fullText);
+						statusText.textContent = "Done";
+						spinner.classList.remove("show");
+						sendBtn.disabled = false;
+						es.close();
+					}
+
+					if (data.error) {
+						botBubble.textContent = "Error: " + data.error;
+						statusText.textContent = "Failed";
+						spinner.classList.remove("show");
+						sendBtn.disabled = false;
+						es.close();
+					}
+				};
+
+				es.onerror = async () => {
+					if (botBubble.textContent === "") {
+						botBubble.textContent = "Error: Streaming failed";
+					}
+					statusText.textContent = "Failed";
+					spinner.classList.remove("show");
+					sendBtn.disabled = false;
+					if (es) es.close();
+				};
+			} catch (error) {
+				botBubble.textContent = "Error: " + error.message;
+				statusText.textContent = "Failed";
+				spinner.classList.remove("show");
+				sendBtn.disabled = false;
+			}
+		}
+
+		sendBtn.addEventListener("click", startSSE);
+
+		prompt.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" && !event.shiftKey) {
+				event.preventDefault();
+				startSSE();
+			}
+		});
+
+		clearBtn.addEventListener("click", () => {
+			if (es) es.close();
+			es = null;
+			messages.innerHTML = '<div class="message bot">Chat cleared. Start a new SSE conversation.</div>';
+			prompt.value = "";
+			statusText.textContent = "Ready";
+			spinner.classList.remove("show");
+			sendBtn.disabled = false;
+		});
+	</script>
+</body>
+
+</html>

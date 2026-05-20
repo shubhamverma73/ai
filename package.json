@@ -1,0 +1,20 @@
+{
+  "name": "open_ai",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Shubham",
+  "license": "ISC",
+  "dependencies": {
+    "@langchain/ollama": "^1.2.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "langchain": "^1.4.0",
+    "zod": "^4.4.3"
+  }
+}

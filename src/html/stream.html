@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Stream Chat Demo</title>
+	<link rel="stylesheet" href="../css/style.css" />
+	<link rel="stylesheet" href="../css/code-theme.css" />
+	<link rel="stylesheet"
+		href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/styles/tokyo-night-dark.min.css" />
+</head>
+
+<body>
+	<div class="page">
+		<div class="chat-shell">
+			<header class="chat-header">
+				<div class="brand">
+					<div class="brand-badge">S</div>
+					<div class="brand-title">
+						<h1>Stream Chat</h1>
+						<p>Fetch streaming response demo</p>
+					</div>
+				</div>
+				<div class="mode-tag">POST + fetch stream</div>
+			</header>
+
+			<main class="chat-body">
+				<section id="messages" class="messages">
+					<div class="message bot">Hello! Type a prompt and see streaming text in real time.</div>
+				</section>
+
+				<section class="composer">
+					<div class="composer-row">
+						<div class="input-wrap">
+							<label for="prompt">Your message</label>
+							<textarea id="prompt" placeholder="Ask something about LangChain or Bhadohi..."
+								required></textarea>
+						</div>
+						<button id="sendBtn" class="primary">Send</button>
+						<button id="clearBtn" class="secondary">Clear</button>
+					</div>
+
+					<div class="meta-row">
+						<div class="status">
+							<span id="spinner" class="spinner"></span>
+							<span id="statusText">Ready</span>
+						</div>
+						<div class="status">Endpoint: <strong>/chat-stream</strong></div>
+					</div>
+				</section>
+			</main>
+		</div>
+	</div>
+
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/highlight.min.js"></script>
+
+	<script>
+		const messages = document.getElementById("messages");
+		const prompt = document.getElementById("prompt");
+		const sendBtn = document.getElementById("sendBtn");
+		const clearBtn = document.getElementById("clearBtn");
+		const spinner = document.getElementById("spinner");
+		const statusText = document.getElementById("statusText");
+
+		marked.setOptions({
+			breaks: true,
+			gfm: true,
+		});
+
+		const renderMarkdownFinal = (element, text) => {
+			element.innerHTML = marked.parse(text);
+
+			element.querySelectorAll("pre code").forEach((block) => {
+				hljs.highlightElement(block);
+			});
+		};
+
+		const renderStreamingPlainText = (element, text) => {
+			element.textContent = text;
+		};
+
+		const renderMarkdown = (element, text) => {
+			element.innerHTML = marked.parse(text);
+			element.querySelectorAll("pre code").forEach((block) => {
+				hljs.highlightElement(block);
+			});
+		};
+
+		const addMessage = (text, type) => {
+			const div = document.createElement("div");
+			div.className = `message ${type}`;
+
+			if (type === "bot") {
+				renderMarkdown(div, text);
+			} else {
+				div.textContent = text;
+			}
+
+			messages.appendChild(div);
+			messages.scrollTop = messages.scrollHeight;
+			return div;
+		};
+
+		async function sendMessage() {
+			const message = prompt.value.trim() || "Explain LangChain in simple Hindi.";
+			const userId = "user_101";
+
+			addMessage(message, "user");
+
+			const botBubble = addMessage("", "bot");
+			let fullText = "";
+
+			sendBtn.disabled = true;
+			spinner.classList.add("show");
+			statusText.textContent = "Streaming...";
+			prompt.value = "";
+
+			try {
+				const response = await fetch("http://localhost:5000/chat-stream", {
+					method: "POST",
+					headers: {
+						"Content-Type": "application/json",
+						"x-user-id": userId
+					},
+					body: JSON.stringify({
+						message,
+						userId
+					})
+				});
+
+				if (!response.ok) {
+					let errorMessage = `Request failed (${response.status})`;
+
+					try {
+						const errorData = await response.json();
+						errorMessage = errorData.error || errorMessage;
+					} catch {
+						try {
+							errorMessage = await response.text();
+						} catch { }
+					}
+
+					throw new Error(errorMessage);
+				}
+
+				if (!response.body) {
+					throw new Error("Response body missing");
+				}
+
+				const reader = response.body.getReader();
+				const decoder = new TextDecoder();
+
+				while (true) {
+					const { done, value } = await reader.read();
+					if (done) break;
+
+					fullText += decoder.decode(value, { stream: true });
+					renderStreamingPlainText(botBubble, fullText);
+					messages.scrollTop = messages.scrollHeight;
+				}
+
+				renderMarkdownFinal(botBubble, fullText);
+				statusText.textContent = "Done";
+			} catch (error) {
+				botBubble.textContent = "Error: " + error.message;
+				statusText.textContent = "Failed";
+			} finally {
+				sendBtn.disabled = false;
+				spinner.classList.remove("show");
+			}
+		}
+
+		sendBtn.addEventListener("click", sendMessage);
+
+		prompt.addEventListener("keydown", (event) => {
+			if (event.key === "Enter" && !event.shiftKey) {
+				event.preventDefault();
+				sendMessage();
+			}
+		});
+
+		clearBtn.addEventListener("click", () => {
+			messages.innerHTML = '<div class="message bot">Chat cleared. Send a new message.</div>';
+			prompt.value = "";
+			statusText.textContent = "Ready";
+			spinner.classList.remove("show");
+		});
+	</script>
+</body>
+
+</html>
