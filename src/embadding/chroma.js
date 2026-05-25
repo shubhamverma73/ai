@@ -20,7 +20,7 @@ const client = new CloudClient({
 
 async function getCollection() {
     return await client.getOrCreateCollection({
-        name: 'species',
+        name: 'my_details',
     });
 }
 
@@ -66,8 +66,8 @@ async function searchCollection(query, nResults = 3) { // nResults set to 1 to g
 }
 
 if (import.meta.url === pathToFileURL(process.argv[1]).href) {
-    //await addDocument('My age is 30');
-    await searchCollection('get birds only');
+    //await addDocument('I am passionate about coding');
+    await searchCollection('What i like?');
 }
 
 export { getCollection, addDocument, searchCollection };
