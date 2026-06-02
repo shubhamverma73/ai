@@ -99,4 +99,4 @@ else:
 # https://youtu.be/dl0p3XRBIuI?si=NDJZ9-ETolJbxfnw [Learn how create Model, complie, train, evaluate (Test) and predict (get data from model) ]
 # with help of verbose = 1, we can track every steps of evaluate like number os steps one by one, loss and accuracy.
 # in every steps, accuracy will increase and loss witll decrease
-# we can use callback function if we want to stop epoch if accuracy is acchieved the target we decided.
+# we can use callback function if we want to stop epoch if accuracy is acchieved the target we decided. (https://github.com/shubhamverma73/ai/blob/main/python/tensorform/Stop%20epoch%20if%20accuracy%20target%20acchieved.ipynb)
