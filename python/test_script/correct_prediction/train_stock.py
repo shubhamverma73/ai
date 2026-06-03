@@ -18,15 +18,27 @@ data = yf.download(
     end="2026-06-01"
 )
 
-close_prices = data[['Close']]
+features = data[
+    ['Open', 'High', 'Low', 'Close', 'Volume']
+]
 
-scaler = MinMaxScaler(feature_range=(0, 1))
-scaled_data = scaler.fit_transform(close_prices)
+target = data[['Close']]
 
-# Save scaler
+feature_scaler = MinMaxScaler()
+target_scaler = MinMaxScaler()
+
+scaled_features = feature_scaler.fit_transform(features)
+scaled_target = target_scaler.fit_transform(target)
+
+# Save scalers
 joblib.dump(
-    scaler,
-    f"{ticker}_scaler.pkl"
+    feature_scaler,
+    f"{ticker}_feature_scaler.pkl"
+)
+
+joblib.dump(
+    target_scaler,
+    f"{ticker}_target_scaler.pkl"
 )
 
 X = []
@@ -34,18 +46,23 @@ y = []
 
 sequence_length = 60
 
-for i in range(sequence_length, len(scaled_data)):
-    X.append(scaled_data[i-sequence_length:i, 0])
-    y.append(scaled_data[i, 0])
+for i in range(sequence_length, len(scaled_features)):
+    X.append(
+        scaled_features[i-sequence_length:i]
+    )
+
+    # Close column = index 3
+
+    y.append(
+        scaled_target[i, 0]
+    )
 
 X = np.array(X)
 y = np.array(y)
 
-X = X.reshape((X.shape[0], X.shape[1], 1))
-
 '''
 model = Sequential([
-    LSTM(50, return_sequences=True, input_shape=(60, 1)),
+    LSTM(50, return_sequences=True, input_shape=(60, 5)),
     LSTM(50),
     Dense(25),
     Dense(1)
@@ -53,7 +70,7 @@ model = Sequential([
 '''
 
 model = Sequential([
-    GRU(50, return_sequences=True, input_shape=(60, 1)),
+    GRU(50, return_sequences=True, input_shape=(60, 5)),
     GRU(50),
     Dense(25),
     Dense(1)
@@ -77,7 +94,7 @@ model.save(
 )
 
 print(f"\nModel saved: {ticker}_stock_model.keras")
-print(f"Scaler saved: {ticker}_scaler.pkl")
+print(f"Scaler saved: {ticker}_feature_scaler.pkl")
 
 # for train
 # python train_stock.py AAPL
