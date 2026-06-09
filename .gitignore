@@ -22,3 +22,28 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Virtual Environment
+venv/
+rag/venv/
+rag_stream/venv/
+.venv/
+
+# -------------------------
+# Node.js
+# -------------------------
+node_modules/
+
+# -------------------------
+# Python
+# -------------------------
+__pycache__/
+*.pyc
+*.pyo
+
+# Jupyter
+.ipynb_checkpoints/
+
+# OS Files
+.DS_Store
+Thumbs.db
