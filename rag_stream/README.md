@@ -87,8 +87,9 @@ User (Browser)
 4. Ask questions about the uploaded PDF
 5. The system retrieves relevant content from Chroma and generates answers using Ollama
 
-
-## ===================================== FULL DETAILS =====================================
+---
+##  FULL DETAILS
+---
 # PDF RAG Chatbot with Streaming
 
 A Retrieval-Augmented Generation (RAG) chatbot built using Flask, LangChain, ChromaDB Cloud, and Ollama.
