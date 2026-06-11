@@ -81,3 +81,36 @@ RAG / Web
 ✅ Distance-Based Routing
 ✅ Query Rewriting for Follow-Ups
 ```
+
+
+### 4. Phase wise:
+Phase 1
+   ✅ Basic RAG:
+         PDF Upload
+         Chunking
+         Embeddings
+         ChromaDB
+         Retrieval
+         LLM Answer
+
+Phase 2
+   ✅ Better RAG:
+         Multi-PDF
+         Streaming Response
+         Source Citation
+         Chat History
+
+Phase 3
+
+   ✅ Agentic AI:
+         Calculator Tool
+         Web Search Tool
+         RAG Tool
+         Tool Selection
+         Follow-up Query Handling
+
+### 4.1 Pending:
+
+Phase 4
+
+   ✅ MCP (Model Context Protocol)
