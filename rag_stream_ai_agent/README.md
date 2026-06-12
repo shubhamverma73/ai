@@ -1,220 +1,103 @@
-# Execution Order
+# 🤖 RAG Stream AI Agent
 
-## Step 1: Store PDF in Chroma Database
+An Agentic RAG system built using Python, Flask, ChromaDB, Ollama, and custom tools.
 
-Run the following command:
+This project extends a traditional RAG pipeline by introducing an AI Agent capable of selecting the most appropriate tool to answer a user's question.
 
-```bash
-python ingest.py
-```
+Instead of always using document retrieval, the agent can dynamically choose between:
 
-**Expected Output:**
+* RAG Search
+* Calculator Tool
+* Web Search Tool
+
+---
+
+# 🚀 Features
+
+## RAG Features
+
+* PDF Ingestion
+* Document Chunking
+* Embeddings
+* ChromaDB Vector Database
+* Semantic Search
+* Source Citation
+* Streaming Responses
+
+## Agent Features
+
+* Tool Calling
+* Dynamic Tool Selection
+* Query Rewriting
+* Follow-Up Question Detection
+* Distance-Based Routing
+* Multi-Turn Conversations
+
+## Tools
+
+* RAG Tool
+* Calculator Tool
+* Web Search Tool
+
+---
+
+# 📂 Project Structure
 
 ```text
-PDF stored successfully!
-```
-
----
-
-## Step 2: Start the Flask Server
-
-Run:
-
-```bash
-python app.py
-```
-
-**Expected Output:**
-
-```text
-Running on:
-http://127.0.0.1:5000
-```
-
----
-
-## Step 3: Open the Application
-
-Open the following URL in your browser:
-
-```text
-http://127.0.0.1:5000
-```
-
----
-
-## Step 4: Ask a Question
-
-Example:
-
-```text
-What is leave policy?
-```
-
----
-
-## How It Works
-
-```text
-User (Browser)
-      │
-      ▼
-    Flask
-      │
-      ▼
-    rag.py
-      │
-      ▼
- Chroma DB
-      │
-      ▼
-   Ollama
-      │
-      ▼
-   Answer
-      │
-      ▼
- User (Browser)
-```
-
----
-
-## Workflow Summary
-
-1. Store PDF documents in Chroma using `ingest.py`
-2. Start the Flask application using `app.py`
-3. Open the web interface in your browser
-4. Ask questions about the uploaded PDF
-5. The system retrieves relevant content from Chroma and generates answers using Ollama
-
----
-##  FULL DETAILS
----
-# PDF RAG Chatbot with Streaming
-
-A Retrieval-Augmented Generation (RAG) chatbot built using Flask, LangChain, ChromaDB Cloud, and Ollama.
-
-The chatbot can:
-
-* Chat with one or multiple PDF documents
-* Retrieve relevant information from PDFs
-* Show source citations
-* Maintain chat memory
-* Support history-aware retrieval
-* Stream responses token-by-token
-* Use ChromaDB Cloud for vector storage
-
----
-
-# Features
-
-✅ PDF Loading
-
-✅ Multi-PDF Support
-
-✅ Text Chunking
-
-✅ Embeddings using Ollama
-
-✅ ChromaDB Cloud Storage
-
-✅ Retrieval-Augmented Generation (RAG)
-
-✅ Source Citations
-
-✅ Chat Memory (Last 5 Conversations)
-
-✅ History-Aware Retrieval
-
-✅ Streaming Responses
-
----
-
-# Tech Stack
-
-* Flask
-* LangChain
-* ChromaDB Cloud
-* Ollama
-* llama3:8b
-* nomic-embed-text
-* HTML
-* CSS
-* JavaScript
-
----
-
-# Project Structure
-
-```text
-rag/
+rag_stream_ai_agent/
+│
+├── app.py
+├── agent.py
+├── ingest.py
+├── requirements.txt
+│
+├── chroma/
 │
 ├── data/
-│   └── pdfs/
-│       ├── file1.pdf
-│       └── file2.pdf
 │
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   │
-│   └── js/
-│       └── app.js
+├── tools/
+│   ├── rag_tool.py
+│   ├── calculator_tool.py
+│   └── web_search_tool.py
 │
 ├── templates/
 │   └── index.html
 │
-├── app.py
-├── rag.py
-├── ingest.py
-├── requirements.txt
-├── .env
-└── README.md
+└── static/
 ```
 
 ---
 
-# Clone Repository
+# ⚙️ Installation
+
+## Clone Repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-
-cd rag
+git clone <repository_url>
+cd rag_stream_ai_agent
 ```
 
----
-
-# Create Virtual Environment
-
-Windows
+## Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-Activate
+## Activate Environment
 
-CMD:
+### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Git Bash:
+### Linux / Mac
 
 ```bash
-source venv/Scripts/activate
+source venv/bin/activate
 ```
 
-PowerShell:
-
-```powershell
-venv\Scripts\Activate.ps1
-```
-
----
-
-# Install Dependencies
+## Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -222,135 +105,31 @@ pip install -r requirements.txt
 
 ---
 
-# Install Ollama
+# 📄 Ingest Documents
 
-Download:
-
-https://ollama.com
-
-Verify:
-
-```bash
-ollama --version
-```
-
----
-
-# Download Models
-
-LLM:
-
-```bash
-ollama pull llama3:8b
-```
-
-Embedding Model:
-
-```bash
-ollama pull nomic-embed-text
-```
-
-Verify:
-
-```bash
-ollama list
-```
-
-Expected:
+Place PDF files inside:
 
 ```text
-llama3:8b
-nomic-embed-text
+data/
 ```
 
----
-
-# ChromaDB Cloud Setup
-
-Create account:
-
-https://www.trychroma.com
-
-Create:
-
-* Tenant
-* Database
-
-Copy:
-
-* API Key
-* Tenant ID
-* Database Name
-
----
-
-# Environment Variables
-
-Create `.env`
-
-```env
-CHROMA_API_KEY=YOUR_API_KEY
-CHROMA_TENANT=YOUR_TENANT
-CHROMA_DATABASE=YOUR_DATABASE
-```
-
----
-
-# Add PDFs
-
-Place PDFs inside:
-
-```text
-data/pdfs/
-```
-
-Example:
-
-```text
-data/pdfs/company_policy.pdf
-data/pdfs/environment_policy.pdf
-```
-
----
-
-# Ingest PDFs
-
-Run once after adding PDFs.
+Run:
 
 ```bash
 python ingest.py
 ```
 
-This will:
-
-* Load PDFs
-* Chunk Documents
-* Generate Embeddings
-* Store Embeddings in ChromaDB
-
-Expected:
-
-```text
-Loading: company_policy.pdf
-Loading: environment_policy.pdf
-
-Pages Loaded: XX
-Chunks Created: XX
-
-PDF stored successfully!
-```
+This generates embeddings and stores them inside ChromaDB.
 
 ---
 
-# Run Application
-
-Start Flask server:
+# ▶️ Run Application
 
 ```bash
 python app.py
 ```
 
-Open:
+Open browser:
 
 ```text
 http://127.0.0.1:5000
@@ -358,47 +137,160 @@ http://127.0.0.1:5000
 
 ---
 
-# Example Questions
+# 🏗️ System Architecture
 
 ```text
-What is the company's top priority?
-
-Explain the STOP principle.
-
-How does the company contribute to environmental protection?
-
-What are the employee safety guidelines?
+User
+ │
+ ▼
+ AI Agent
+ │
+ ▼
+ Tool Decision
+ │
+ ├──────────────► Calculator Tool
+ │
+ ├──────────────► RAG Tool
+ │
+ └──────────────► Web Search Tool
+ │
+ ▼
+ Response
 ```
 
 ---
 
-# Current Capabilities
+# 🔄 Agent Workflow
 
-* Multi-PDF Retrieval
-* Source Citations
-* Streaming Responses
-* Chat Memory
-* History-Aware Retrieval
+```text
+Question
+ │
+ ▼
+ Follow-Up Detection
+ │
+ ▼
+ Query Rewriting
+ │
+ ▼
+ Distance Router
+ │
+ ├──────────────► RAG Search
+ │
+ └──────────────► Web Search
+ │
+ ▼
+ Final Answer
+```
 
 ---
 
-# Future Improvements
+# 🎯 Distance-Based Routing
 
-* Agentic RAG
+The system measures semantic distance between the user query and the retrieved document chunks.
+
+### Low Distance
+
+```text
+Distance <= Threshold
+```
+
+Agent uses:
+
+```text
+RAG Tool
+```
+
+### High Distance
+
+```text
+Distance > Threshold
+```
+
+Agent uses:
+
+```text
+Web Search Tool
+```
+
+This helps prevent hallucinations and improves answer quality.
+
+---
+
+# 🧠 Agent Capabilities
+
+### Mathematical Questions
+
+Example:
+
+```text
+What is 250 * 43?
+```
+
+Selected Tool:
+
+```text
+Calculator Tool
+```
+
+---
+
+### Document Questions
+
+Example:
+
+```text
+What are MTAR Technologies revenue sources?
+```
+
+Selected Tool:
+
+```text
+RAG Tool
+```
+
+---
+
+### General Knowledge Questions
+
+Example:
+
+```text
+Who is the current Prime Minister of India?
+```
+
+Selected Tool:
+
+```text
+Web Search Tool
+```
+
+---
+
+# 📚 Learning Outcomes
+
+This project teaches:
+
+* Agentic AI
+* Tool Calling
+* RAG Pipelines
+* Query Routing
+* Semantic Similarity
+* Multi-Turn Conversations
+* LLM Orchestration
+
+---
+
+# 🔮 Future Improvements
+
+* MCP Integration
+* Multi-Agent Systems
+* Memory Layer
 * Hybrid Search
-* Re-ranking
-* User Authentication
-* Conversation Persistence
-* Citation Highlighting
-* PDF Upload from UI
+* Advanced Tool Registry
+* Production Deployment
 
 ---
 
-# Author
+# 📜 License
 
-Shubham Verma
-AI / Machine Learning Enthusiast
-GitHub: https://github.com/<your-github-username>
-
-```
-```
+This project is intended for learning and educational purposes.

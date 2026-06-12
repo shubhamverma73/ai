@@ -1,220 +1,80 @@
-# Execution Order
+# 🚀 RAG Stream
 
-## Step 1: Store PDF in Chroma Database
+A Retrieval-Augmented Generation (RAG) application built with Python, Flask, ChromaDB, Sentence Transformers, and Ollama.
 
-Run the following command:
+This project demonstrates how to build a basic RAG pipeline that can ingest PDF documents, store embeddings in a vector database, retrieve relevant context, and generate answers using an LLM.
 
-```bash
-python ingest.py
-```
+---
 
-**Expected Output:**
+## 📌 Features
+
+* PDF Ingestion
+* Document Chunking
+* Embedding Generation
+* ChromaDB Vector Storage
+* Semantic Search
+* Context Retrieval
+* Ollama Integration
+* Streaming Responses
+* Flask Web Interface
+
+---
+
+## 📂 Project Structure
 
 ```text
-PDF stored successfully!
-```
-
----
-
-## Step 2: Start the Flask Server
-
-Run:
-
-```bash
-python app.py
-```
-
-**Expected Output:**
-
-```text
-Running on:
-http://127.0.0.1:5000
-```
-
----
-
-## Step 3: Open the Application
-
-Open the following URL in your browser:
-
-```text
-http://127.0.0.1:5000
-```
-
----
-
-## Step 4: Ask a Question
-
-Example:
-
-```text
-What is leave policy?
-```
-
----
-
-## How It Works
-
-```text
-User (Browser)
-      │
-      ▼
-    Flask
-      │
-      ▼
-    rag.py
-      │
-      ▼
- Chroma DB
-      │
-      ▼
-   Ollama
-      │
-      ▼
-   Answer
-      │
-      ▼
- User (Browser)
-```
-
----
-
-## Workflow Summary
-
-1. Store PDF documents in Chroma using `ingest.py`
-2. Start the Flask application using `app.py`
-3. Open the web interface in your browser
-4. Ask questions about the uploaded PDF
-5. The system retrieves relevant content from Chroma and generates answers using Ollama
-
----
-##  FULL DETAILS
----
-# PDF RAG Chatbot with Streaming
-
-A Retrieval-Augmented Generation (RAG) chatbot built using Flask, LangChain, ChromaDB Cloud, and Ollama.
-
-The chatbot can:
-
-* Chat with one or multiple PDF documents
-* Retrieve relevant information from PDFs
-* Show source citations
-* Maintain chat memory
-* Support history-aware retrieval
-* Stream responses token-by-token
-* Use ChromaDB Cloud for vector storage
-
----
-
-# Features
-
-✅ PDF Loading
-
-✅ Multi-PDF Support
-
-✅ Text Chunking
-
-✅ Embeddings using Ollama
-
-✅ ChromaDB Cloud Storage
-
-✅ Retrieval-Augmented Generation (RAG)
-
-✅ Source Citations
-
-✅ Chat Memory (Last 5 Conversations)
-
-✅ History-Aware Retrieval
-
-✅ Streaming Responses
-
----
-
-# Tech Stack
-
-* Flask
-* LangChain
-* ChromaDB Cloud
-* Ollama
-* llama3:8b
-* nomic-embed-text
-* HTML
-* CSS
-* JavaScript
-
----
-
-# Project Structure
-
-```text
-rag/
+rag_stream/
+│
+├── app.py
+├── ingest.py
+├── rag.py
+├── requirements.txt
+├── .env
 │
 ├── data/
-│   └── pdfs/
-│       ├── file1.pdf
-│       └── file2.pdf
+│   └── pdf_files/
 │
-├── static/
-│   ├── css/
-│   │   └── style.css
-│   │
-│   └── js/
-│       └── app.js
+├── chroma/
+│   └── vector_db/
 │
 ├── templates/
 │   └── index.html
 │
-├── app.py
-├── rag.py
-├── ingest.py
-├── requirements.txt
-├── .env
-└── README.md
+└── static/
 ```
 
 ---
 
-# Clone Repository
+## ⚙️ Installation
+
+### Clone Repository
 
 ```bash
-git clone <YOUR_REPOSITORY_URL>
-
-cd rag
+git clone <repository_url>
+cd rag_stream
 ```
 
----
-
-# Create Virtual Environment
-
-Windows
+### Create Virtual Environment
 
 ```bash
 python -m venv venv
 ```
 
-Activate
+### Activate Virtual Environment
 
-CMD:
+#### Windows
 
 ```bash
 venv\Scripts\activate
 ```
 
-Git Bash:
+#### Linux / Mac
 
 ```bash
-source venv/Scripts/activate
+source venv/bin/activate
 ```
 
-PowerShell:
-
-```powershell
-venv\Scripts\Activate.ps1
-```
-
----
-
-# Install Dependencies
+### Install Dependencies
 
 ```bash
 pip install -r requirements.txt
@@ -222,129 +82,23 @@ pip install -r requirements.txt
 
 ---
 
-# Install Ollama
+## 📄 Add Documents
 
-Download:
-
-https://ollama.com
-
-Verify:
-
-```bash
-ollama --version
-```
-
----
-
-# Download Models
-
-LLM:
-
-```bash
-ollama pull llama3:8b
-```
-
-Embedding Model:
-
-```bash
-ollama pull nomic-embed-text
-```
-
-Verify:
-
-```bash
-ollama list
-```
-
-Expected:
+Place your PDF files inside:
 
 ```text
-llama3:8b
-nomic-embed-text
+data/
 ```
 
----
-
-# ChromaDB Cloud Setup
-
-Create account:
-
-https://www.trychroma.com
-
-Create:
-
-* Tenant
-* Database
-
-Copy:
-
-* API Key
-* Tenant ID
-* Database Name
-
----
-
-# Environment Variables
-
-Create `.env`
-
-```env
-CHROMA_API_KEY=YOUR_API_KEY
-CHROMA_TENANT=YOUR_TENANT
-CHROMA_DATABASE=YOUR_DATABASE
-```
-
----
-
-# Add PDFs
-
-Place PDFs inside:
-
-```text
-data/pdfs/
-```
-
-Example:
-
-```text
-data/pdfs/company_policy.pdf
-data/pdfs/environment_policy.pdf
-```
-
----
-
-# Ingest PDFs
-
-Run once after adding PDFs.
+Run ingestion:
 
 ```bash
 python ingest.py
 ```
 
-This will:
-
-* Load PDFs
-* Chunk Documents
-* Generate Embeddings
-* Store Embeddings in ChromaDB
-
-Expected:
-
-```text
-Loading: company_policy.pdf
-Loading: environment_policy.pdf
-
-Pages Loaded: XX
-Chunks Created: XX
-
-PDF stored successfully!
-```
-
 ---
 
-# Run Application
-
-Start Flask server:
+## ▶️ Run Application
 
 ```bash
 python app.py
@@ -358,47 +112,45 @@ http://127.0.0.1:5000
 
 ---
 
-# Example Questions
+## 🏗️ Architecture
 
 ```text
-What is the company's top priority?
-
-Explain the STOP principle.
-
-How does the company contribute to environmental protection?
-
-What are the employee safety guidelines?
+User
+ │
+ ▼
+Flask App
+ │
+ ▼
+Retriever
+ │
+ ▼
+ChromaDB
+ │
+ ▼
+Relevant Chunks
+ │
+ ▼
+Ollama LLM
+ │
+ ▼
+Final Answer
 ```
 
 ---
 
-# Current Capabilities
+## 🎯 Learning Objectives
 
-* Multi-PDF Retrieval
-* Source Citations
-* Streaming Responses
-* Chat Memory
-* History-Aware Retrieval
+This project helps understand:
 
----
-
-# Future Improvements
-
-* Agentic RAG
-* Hybrid Search
-* Re-ranking
-* User Authentication
-* Conversation Persistence
-* Citation Highlighting
-* PDF Upload from UI
+* Retrieval-Augmented Generation (RAG)
+* Vector Databases
+* Embeddings
+* Semantic Search
+* Context Injection
+* LLM Integration
 
 ---
 
-# Author
+## 📜 License
 
-Shubham Verma
-AI / Machine Learning Enthusiast
-GitHub: https://github.com/<your-github-username>
-
-```
-```
+This project is intended for learning and experimentation purposes.
