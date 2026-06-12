@@ -71,4 +71,8 @@ def web_search(question: str):
 
 if __name__ == "__main__":
 
-    mcp.run()
+    #mcp.run()
+
+    print("\nStarting MCP SSE Server...")
+
+    mcp.run(transport="sse")

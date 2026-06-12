@@ -128,6 +128,16 @@ def agent_answer(question):
 
     # ------------------------------------------
     # Calculator via MCP
+    # Flow:
+    #       Agent
+    #       ↓
+    #       client.py
+    #       ↓
+    #       MCP
+    #       ↓
+    #       server.py
+    #       ↓
+    #       calculator_tool.py
     # ------------------------------------------
 
     if tool_name == "calculator":
@@ -283,3 +293,21 @@ def stream_agent_answer(question):
         yield from stream_answer(
             question
         )
+
+
+    # if tool_name == "rag_search":
+
+    #     result = asyncio.run(
+    #         call_tool(
+    #             "rag_search",
+    #             {
+    #                 "question": question
+    #             }
+    #         )
+    #     )
+
+    #     yield result["answer"]
+
+    #     yield "\n__END_STREAM__"
+
+    #     return
