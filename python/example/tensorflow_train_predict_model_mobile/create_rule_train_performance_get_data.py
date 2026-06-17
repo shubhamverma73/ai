@@ -13,16 +13,16 @@ Matlab first row ka meaning hua:
 '''
 
 X_train = np.array([
-    [1, 40, 0],
-    [2, 45, 1],
-    [2, 50, 0],
-    [3, 60, 1],
-    [4, 65, 1],
-    [5, 70, 1],
-    [6, 75, 1],
-    [7, 80, 1],
-    [8, 85, 1],
-    [9, 90, 1]
+    [1, 40, 0], # expected fail  0
+    [2, 45, 1], # expected fail  0
+    [2, 50, 0], # expected fail  0
+    [3, 60, 1], # maybe borderline  0
+    [4, 65, 1], # expected pass  1
+    [5, 70, 1], # expected pass  1
+    [6, 75, 1], # expected pass  1
+    [7, 80, 1], # expected pass  1
+    [8, 85, 1], # expected pass  1
+    [9, 90, 1] # expected pass  1
 ], dtype=np.float32)
 
 # labels: 0 = fail, 1 = pass
