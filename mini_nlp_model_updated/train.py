@@ -73,12 +73,12 @@ questions = [
 ]
 
 # Labels
-labels = [
-    0,0,0,0,0,0,0,0,0,0,0,
-    1,1,1,1,1,1,1,1,1,
-    2,2,2,2,2,2,2,2,2,
-    3,3,3,3,3,3,
-    4,4,4,4,4,4
+labels = [ # based on the order of questions, we are assigning labels to each question nd get the data from label_mapping.json file
+    0,0,0,0,0,0,0,0,0,0,0, # AI
+    1,1,1,1,1,1,1,1,1, # RAG
+    2,2,2,2,2,2,2,2,2, # MCP
+    3,3,3,3,3,3, # LangChain
+    4,4,4,4,4,4 # LangGraph
 ]
 
 # Convert text → numbers

@@ -98,8 +98,8 @@ print(f"Pages Loaded: {len(all_docs)}")
 # -------------------------
 
 splitter = RecursiveCharacterTextSplitter(
-    chunk_size=1000,
-    chunk_overlap=200
+    chunk_size=1000, # Size of each chunk means number of characters in each chunk
+    chunk_overlap=200 # Overlap between chunks means context is preserved across chunks
 )
 
 chunks = splitter.split_documents(all_docs)

@@ -1,8 +1,8 @@
-import tensorflow as tf
 import numpy as np
 import json
+from keras.models import load_model
 
-model = tf.keras.models.load_model( "mini_faq_model.keras" )
+model = load_model( "mini_faq_model.keras" )
 
 with open( "label_mapping.json", "r", encoding="utf-8") as f:
     answers = json.load(f)
