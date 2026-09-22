@@ -47,7 +47,3 @@ __pycache__/
 # OS Files
 .DS_Store
 Thumbs.db
-
-# Envirunment Variables
-rag_stream_ai_agent_test_ragas/.env
-src/.ENV

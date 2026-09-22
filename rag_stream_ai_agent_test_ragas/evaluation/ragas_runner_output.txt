@@ -1,0 +1,49 @@
+
+EFFECTIVE QUERY:
+what about Hazard identification?
+
+SOURCES RETRIEVED:
+safety_manual.pdf Page 1
+safety_manual.pdf Page 3
+safety_manual.pdf Page 2
+safety_manual.pdf Page 1
+safety_manual.pdf Page 3
+
+RETRIEVED DOCS:
+
+--- DOC 1 ---
+
+Use required personal protective equipment for each task.
+Stop work when a task becomes unsafe or unclear.
+Management should provide training, enforce rules, and supply safe equipment and protective
+gear. Supervisors should identify hazards, correct unsafe behavior, and verify
+that employees unders
+
+--- DOC 2 ---
+Do not handle ?ammable liquids in enclosed areas, and keep ignition sources controlled.
+ Workers should know extinguisher locations and basic response steps, while only
+trained personnel should handle higher-risk emergency actions.
+Training and communication are essential because a safety manual onl
+
+--- DOC 3 ---
+use metal ladders for electrical work.
+Personal protective equipment should be selected based on the hazards present in the task or
+area. Typical PPE may include gloves, safety glasses, face shields, hearing
+protection, and protective footwear.
+Hazard Example PPE Guidance
+Flying particles Safety gla
+
+--- DOC 4 ---
+A safety manual helps reduce workplace injuries by giving employees clear rules,
+responsibilities, and safe work expectations. A written safety program is also
+presented as an OSHA-related requirement and an important tool for hazard control and
+employee protection.
+This manual is designed as a gene
+
+--- DOC 5 ---
+Safety manuals should be reviewed regularly and updated when equipment, hazards, sta?ng,
+or regulations change. Records may include training logs, inspection reports,
+incident reports, corrective actions, and required safety documentation.
+Wear required PPE before starting work.
+Inspect tools and eq
+================> RAGAs Evaluation Testing Output: {'status': 'ok', 'result': {'answer_relevancy': None, 'context_recall': None, 'faithfulness': None, 'context_precision': None}}
