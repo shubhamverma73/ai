@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+<title>FastAPI Interview Handbook</title>
+<meta name="description" content="FastAPI Interview Preparation Handbook - English Questions, Hindi Answers" />
+<meta name="theme-color" content="#009485" />
+<link rel="manifest" href="manifest.json" />
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="icons/icon.svg" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="dark">
+  <header class="topbar">
+    <button id="sidebarToggle" class="icon-btn" aria-label="Toggle Menu">☰</button>
+    <div class="brand">⚡ <span>FastAPI Handbook</span></div>
+    <div class="topbar-actions">
+      <button id="themeToggle" class="icon-btn" aria-label="Toggle Theme" title="Toggle Light/Dark">🌙</button>
+      <button id="installBtn" class="icon-btn install-btn" aria-label="Install App" title="Install App" hidden>⬇</button>
+    </div>
+  </header>
+
+  <div class="layout">
+    <aside id="sidebar" class="sidebar">
+      <div class="sidebar-header">
+        <span>📚 Categories</span>
+        <button id="sidebarClose" class="icon-btn mobile-only" aria-label="Close Menu">✕</button>
+      </div>
+      <nav id="categoryNav" class="category-nav"></nav>
+      <div class="sidebar-footer">
+        <a href="https://shubhamverma.online/ai/" target="_blank" rel="noopener">🤖 AI Handbook</a>
+        <a href="https://shubhamverma.online/flask/" target="_blank" rel="noopener">🧪 Flask Handbook</a>
+      </div>
+    </aside>
+    <div id="sidebarOverlay" class="sidebar-overlay"></div>
+
+    <main class="content">
+      <div class="hero">
+        <h1>🚀 FastAPI Interview Preparation</h1>
+        <p>This handbook is specially created for FastAPI interview preparation with real project based questions.</p>
+        <ul class="hero-points">
+          <li>✔ English Questions</li>
+          <li>✔ Hindi Answers</li>
+          <li>✔ Project Flow</li>
+          <li>✔ Beginner to Expert</li>
+        </ul>
+      </div>
+
+      <div class="toolbar">
+        <div class="search-box">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="Search questions, answers, tags..." autocomplete="off" />
+          <button id="clearSearch" class="clear-btn" aria-label="Clear search" hidden>✕</button>
+        </div>
+        <div class="toolbar-actions">
+          <button id="expandAll" class="btn">⬇ Expand All</button>
+          <button id="collapseAll" class="btn">⬆ Collapse All</button>
+        </div>
+      </div>
+
+      <div id="searchInfo" class="search-info" hidden></div>
+      <div id="noResult" class="no-result" hidden>😕 No matching questions found. Try a different keyword.</div>
+
+      <div id="qaContainer" class="qa-container"></div>
+
+      <button id="scrollTopBtn" class="scroll-top" aria-label="Scroll to top" hidden>↑</button>
+    </main>
+  </div>
+
+  <footer class="site-footer">
+    Made with ❤ by Shubham Verma &middot; <span id="qCount"></span> Questions
+  </footer>
+
+  <script src="content.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

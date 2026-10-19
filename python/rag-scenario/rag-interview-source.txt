@@ -1,0 +1,1699 @@
+----------------------------------------------
+Question 1
+Scenario
+मान लीजिए आपके पास 100 Pages की PDF है।
+User ने ऐसा प्रश्न पूछा जिसका उत्तर केवल Page 2 पर मौजूद है।
+क्या Retrieval की Accuracy कम हो जाएगी क्योंकि उत्तर शुरुआत में है? अगर वही उत्तर Page 50 या Page 98 पर होता तो क्या फर्क पड़ता?
+Interviewer क्या Check कर रहा है?
+- क्या आपको Vector Search समझ आता है?
+- क्या आपको पता है कि Embedding कैसे काम करती है?
+- क्या Retrieval Page Number के आधार पर होता है या Semantic Search के आधार पर?
+Answer
+नहीं।
+अगर सही तरीके से Chunking और Embedding हुई है तो Page Number से कोई फर्क नहीं पड़ता।
+जब PDF को Chunk किया जाता है तो मान लीज़िए 700 Chunks बन गए।
+Chunk 1
+
+Chunk 2
+
+Chunk 3
+
+....
+
+Chunk 700
+
+हर Chunk का Embedding बनाया जाता है।
+जब User Question पूछता है
+Python में Readonly Property क्या होती है?
+
+तो Question का भी Embedding बनता है।
+फिर Vector Database Page Number नहीं देखता बल्कि यह देखता है
+किस Chunk का Meaning User Query से सबसे ज्यादा मिलता है।
+
+इसलिए चाहे जानकारी
+- Page 2 पर हो
+- Page 50 पर हो
+- Page 98 पर हो
+Retrieval पर कोई फर्क नहीं पड़ना चाहिए।
+Interview में ऐसे बोल सकते हैं
+"Retrieval document position के आधार पर नहीं बल्कि semantic similarity के आधार पर होता है। इसलिए Page Number का कोई effect नहीं होता। हाँ, अगर chunking गलत हुई हो या relevant information multiple chunks में टूट गई हो, तब retrieval खराब हो सकता है।"
+
+Common Mistake
+बहुत लोग बोल देते हैं
+शुरुआत वाले Pages पहले Search होंगे।
+
+ये बिल्कुल गलत है।
+Follow-up Question
+अगर Answer दो Chunks में टूट गया हो तो?
+उसका Answer
+Overlap या Parent-Child Retrieval।
+Question 2
+Scenario
+आपको दो Chunk Sizes दी गई हैं।
+200 Tokens
+
+1000 Tokens
+
+कौन सी बेहतर है?
+Interviewer क्या Check कर रहा है?
+- Chunk Size की समझ
+- Precision vs Context
+Answer
+इसका कोई Universal Answer नहीं है।
+यह Use Case पर निर्भर करता है।
+अगर Chunk छोटा होगा
+200 Tokens
+
+तो
+Advantages
+✅ ज्यादा Accurate Retrieval
+✅ कम Noise
+लेकिन
+Disadvantages
+❌ Context टूट सकता है।
+अगर Chunk बड़ा होगा
+1000 Tokens
+
+Advantages
+✅ पूरा Context मिलेगा।
+लेकिन
+Disadvantages
+❌ बहुत Extra Information आ जाएगी।
+❌ Embedding बहुत Generic बन सकती है।
+इसलिए अधिकतर Production Systems
+लगभग
+300-600 Tokens
+
+और
+50-100 Token Overlap
+
+Use करते हैं।
+Interview में Answer
+"Chunk Size हमेशा Accuracy और Context के बीच Trade-off होता है। बहुत छोटे Chunks Context खो देते हैं जबकि बहुत बड़े Chunks Retrieval Precision कम कर देते हैं।"
+
+Question 3
+Scenario
+Chunk Overlap क्यों रखते हैं?
+0 Overlap क्यों नहीं?
+Interviewer क्या Check कर रहा है?
+क्या आपको Context Breaking समझ आता है?
+मान लीजिए Sentence है
+Python एक High Level Programming Language है
+जिसे Guido Van Rossum ने बनाया।
+
+अगर Chunk ऐसे बने
+Chunk 1
+Python एक High Level Programming Language
+
+Chunk 2
+है जिसे Guido Van Rossum ने बनाया।
+
+अब
+पहले Chunk में Creator नहीं है।
+दूसरे Chunk में Language का नाम नहीं है।
+दोनों अधूरे हैं।
+अगर
+50 Token Overlap हो
+तो
+Chunk 1
+Python एक High Level Programming Language
+है जिसे Guido...
+
+Chunk 2
+Programming Language है
+जिसे Guido Van Rossum...
+
+अब दोनों Meaningful हैं।
+Interview Answer
+"Overlap Context टूटने से बचाता है और Chunk Boundary पर Information Loss को कम करता है।"
+
+Question 4
+Scenario
+पूरा एक Page ही एक Chunk क्यों नहीं बना देते?
+Interviewer क्या Check कर रहा है?
+Embedding Limit
+Retrieval Precision
+Answer
+अगर पूरा Page
+एक Chunk बन गया
+तो
+मान लीजिए
+Page में
+PHP
+
+Laravel
+
+Python
+
+Docker
+
+Linux
+
+Java
+
+AWS
+
+Git
+
+API
+
+Database
+
+सब कुछ लिखा है।
+अब Embedding किस Topic की बनेगी?
+वह बहुत Generic हो जाएगी।
+User पूछे
+Docker क्या है?
+
+तो पूरा Page Retrieve होगा।
+जिसमें 95% Information बेकार होगी।
+Interview Answer
+"बहुत बड़े Chunks Generic Embeddings बनाते हैं जिससे Retrieval Precision कम हो जाती है।"
+
+Question 5
+Scenario
+PDF में एक ही Paragraph
+10 बार लिखा है।
+क्या Problem होगी?
+Interviewer क्या Check कर रहा है?
+Duplicate Retrieval
+Answer
+Retriever Top-5 Results देगा
+तो हो सकता है
+Chunk 20
+
+Chunk 57
+
+Chunk 101
+
+Chunk 199
+
+Chunk 340
+
+सभी एक ही Paragraph हों।
+इससे
+LLM को नया Context नहीं मिलेगा।
+Solution
+- Deduplication
+- MMR Retrieval
+- Reranker
+Interview Answer
+"Duplicate Chunks Retrieval Diversity को कम कर देते हैं। इसलिए MMR या Deduplication उपयोग किया जाता है।"
+
+Question 6
+Scenario
+PDF में केवल Tables हैं।
+क्या Normal Chunking सही काम करेगी?
+Interviewer क्या Check कर रहा है?
+Document Parsing
+Answer
+हमेशा नहीं।
+उदाहरण
+Name	Salary
+Amit	50000
+Ravi	70000
+
+
+अगर Parser इसे ऐसे पढ़े
+Name Salary Amit 50000 Ravi 70000
+
+तो Structure खत्म हो जाएगा।
+Embedding भी खराब बनेगी।
+Production में
+- Table Extraction
+- Layout Parser
+- Camelot
+- Tabula
+- OCR
+जैसी Techniques उपयोग की जाती हैं।
+Interview Answer
+"Tables के लिए Structure Preserve करना जरूरी है, वरना Retrieval Accuracy कम हो सकती है।"
+
+Question 7
+Scenario
+PDF पूरी तरह Image Based है।
+कोई Text नहीं है।
+क्या RAG काम करेगा?
+Interviewer क्या Check कर रहा है?
+OCR Knowledge
+Answer
+नहीं।
+RAG सीधे Images नहीं पढ़ता।
+Flow
+Image PDF
+
+↓
+
+OCR
+
+↓
+
+Text
+
+↓
+
+Chunking
+
+↓
+
+Embedding
+
+↓
+
+Vector DB
+
+अगर OCR नहीं होगा
+तो
+Embedding नहीं बनेगी।
+Embedding नहीं बनेगी
+तो Retrieval भी नहीं होगा।
+Interview Answer
+"Image PDF के लिए पहले OCR करना आवश्यक है, तभी Text निकलकर Embedding बन सकती है।"
+
+Question 8
+Scenario
+OCR ने
+OpenAI
+
+को पढ़ लिया
+0penAl
+
+अब क्या होगा?
+Interviewer क्या Check कर रहा है?
+OCR Error Impact
+Answer
+गलत Text
+↓
+गलत Embedding
+↓
+Poor Retrieval
+↓
+गलत Answer
+यानी
+OCR जितना अच्छा होगा
+RAG उतना अच्छा होगा।
+Interview Answer
+"Garbage In, Garbage Out. OCR गलत होगा तो Embedding भी गलत बनेगी और Retrieval Quality घट जाएगी।"
+
+Question 9
+Scenario
+PDF में लिखा है
+Automobile
+
+User पूछता है
+Car
+
+क्या Retrieval होगा?
+Interviewer क्या Check कर रहा है?
+Semantic Search
+Answer
+अधिकतर Cases में
+हाँ।
+क्योंकि Embedding Models
+Word नहीं
+Meaning समझते हैं।
+Car
+
+Vehicle
+
+Automobile
+
+इनका Meaning काफी Similar है।
+इसलिए Embedding भी Similar होगी।
+लेकिन
+अगर Keyword Search होती
+तो
+Car
+
+नहीं मिलता।
+Interview Answer
+"Embedding आधारित Retrieval शब्दों के बजाय अर्थ (Semantic Meaning) पर आधारित होती है, इसलिए Car और Automobile जैसे समानार्थी शब्दों को भी अक्सर सही तरीके से Match कर लिया जाता है।"
+
+Question 10
+Scenario
+अगर Elasticsearch से Search हो सकता है
+तो Vector Database की क्या जरूरत है?
+Interviewer क्या Check कर रहा है?
+Keyword Search vs Semantic Search
+Answer
+Keyword Search
+Car
+
+सिर्फ
+Car
+
+ढूंढेगा।
+अगर लिखा है
+Automobile
+
+तो Result नहीं मिलेगा।
+लेकिन
+Embedding Search
+Meaning समझती है।
+Car
+
+Vehicle
+
+Automobile
+
+तीनों Related हैं।
+लेकिन
+Keyword Search भी जरूरी है।
+उदाहरण
+HTTP 404
+
+PHP 8.4
+
+GPT-4o
+
+SKU123
+
+Invoice-1001
+
+इनमें Exact Match चाहिए।
+इसलिए आजकल
+सबसे अच्छा तरीका है
+Hybrid Search
+Keyword Search
+
++
+
+Semantic Search
+
+Interview Answer
+"Keyword Search Exact शब्द ढूंढती है जबकि Vector Search अर्थ (Semantic Meaning) समझकर खोज करती है। Production Systems में अक्सर दोनों को मिलाकर Hybrid Search का उपयोग किया जाता है ताकि Accuracy और Recall दोनों बेहतर मिलें।"
+-------------------------------------------------------------------------------
+Question 11
+Scenario
+आपने RAG बनाया है।
+लेकिन User बोलता है कि
+"सिस्टम गलत Chunk उठा रहा है।"
+
+अब कैसे पता करेंगे कि गलती कहाँ है?
+- Embedding Model?
+- Vector Database?
+- Chunking?
+- LLM?
+Interviewer क्या Check कर रहा है?
+क्या आप Debugging कर सकते हैं या सिर्फ LangChain चलाना जानते हैं?
+Answer
+सीधे किसी एक Component को दोष नहीं देना चाहिए।
+Production में Step-by-Step Debug करते हैं।
+Step 1
+सबसे पहले देखें
+क्या Chunking सही हुई?
+उदाहरण
+अगर पूरा Paragraph तीन अलग-अलग Chunks में टूट गया है
+तो Retrieval खराब हो सकती है।
+Step 2
+Embedding सही बनी?
+अगर OCR गलत था
+तो Embedding भी गलत होगी।
+Step 3
+Retriever कितना Relevant Result ला रहा है?
+Top-5 Results देखें।
+अगर Relevant Chunk Top-50 में है
+लेकिन Top-5 में नहीं
+तो समस्या Retriever में हो सकती है।
+Step 4
+अगर Retrieval सही है
+लेकिन LLM गलत Answer दे रहा है
+तो Problem Prompt या LLM की है।
+Interview Answer
+"मैं सबसे पहले Retrieval Pipeline को Step-by-Step Debug करूंगा। Chunking, Embedding, Retriever और अंत में LLM को अलग-अलग जांचूंगा। बिना Analysis किए किसी एक Component को दोष नहीं दूंगा।"
+
+Question 12
+Scenario
+100 PDFs हैं।
+उनमें से 60 लगभग एक जैसी हैं।
+अब User पूछता है
+Leave Policy क्या है?
+
+Retriever क्या करेगा?
+Interviewer क्या Check कर रहा है?
+Duplicate Retrieval
+Answer
+Top-10 Results में
+हो सकता है
+PDF 1
+
+PDF 3
+
+PDF 7
+
+PDF 18
+
+PDF 21
+
+सभी एक ही Content दें।
+LLM को नया Context नहीं मिलेगा।
+Solution
+- MMR (Maximum Marginal Relevance)
+- Deduplication
+- Reranker
+Interview Answer
+"Similar Documents होने पर Retriever बार-बार एक जैसा Context ला सकता है। MMR Diversity बढ़ाता है ताकि अलग-अलग Relevant Chunks मिल सकें।"
+
+Question 13
+Scenario
+User पूछता है
+Leave
+
+बस इतना।
+अब Retriever कैसे समझे?
+Interviewer क्या Check कर रहा है?
+Query Expansion
+Answer
+System Query को Expand कर सकता है।
+Leave
+
+↓
+Annual Leave
+
+Paid Leave
+
+Sick Leave
+
+Leave Policy
+
+Employee Leave Rules
+
+अब Retrieval बेहतर होगी।
+Interview Answer
+"Query Expansion छोटे या अस्पष्ट Queries को अधिक Meaningful बनाकर Retrieval Recall बढ़ाती है।"
+
+Question 14
+Scenario
+Database में
+1000 PDFs हैं।
+User बोलता है
+केवल HR Policy में Search करो।
+
+कैसे करेंगे?
+Interviewer क्या Check कर रहा है?
+Metadata Filtering
+Answer
+हर Chunk के साथ Metadata Store करेंगे।
+उदाहरण
+Department = HR
+
+File = HR Policy.pdf
+
+Year = 2025
+
+फिर Search
+Department = HR
+
+के Filter के साथ होगी।
+अब बाकी PDFs Search ही नहीं होंगी।
+Interview Answer
+"Metadata Filtering Search Space कम करती है, जिससे Accuracy और Speed दोनों बढ़ते हैं।"
+
+Question 15
+Scenario
+Sentence दो Chunks में टूट गया।
+User वही Question पूछता है।
+क्या Problem होगी?
+Interviewer क्या Check कर रहा है?
+Chunk Boundary Problem
+Answer
+मान लीजिए
+Chunk 1
+Python was developed
+
+Chunk 2
+by Guido Van Rossum.
+
+अगर केवल Chunk 1 Retrieve हुआ
+तो Answer अधूरा होगा।
+Solution
+- Overlap
+- Parent-Child Retrieval
+Interview Answer
+"Chunk Boundary पर Context टूट सकता है। इसलिए Overlap या Parent-Child Retrieval उपयोग किया जाता है।"
+
+Question 16
+Scenario
+Retriever हमेशा
+Top-20 Results भेजता है।
+क्या यह सही है?
+Interviewer क्या Check कर रहा है?
+Top-K Optimization
+Answer
+जरूरी नहीं।
+अगर
+Top-20 भेजेंगे
+तो
+- Context Window भर जाएगी।
+- बहुत Noise आएगा।
+- LLM Confuse हो सकता है।
+- Cost बढ़ेगी।
+- Latency बढ़ेगी।
+Production में
+Top-K Use Case के अनुसार चुना जाता है।
+जैसे
+Top-3
+
+Top-5
+
+Top-8
+
+Interview Answer
+"Top-K जितना बड़ा होगा उतना अधिक Noise आएगा। इसलिए Optimal K चुनना जरूरी है।"
+
+Question 17
+Scenario
+तो फिर हमेशा
+Top-1
+क्यों नहीं?
+Interviewer क्या Check कर रहा है?
+Recall vs Precision
+Answer
+मान लीजिए
+Answer
+दो Chunks में है।
+अगर केवल
+Top-1
+आया
+तो
+LLM को आधी Information मिलेगी।
+इसलिए
+Production में
+Top-3 या Top-5
+अधिक उपयोग होता है।
+Interview Answer
+"Top-1 Precision बढ़ा सकता है लेकिन Recall घटा देता है। इसलिए कई बार Multiple Chunks जरूरी होते हैं।"
+
+Question 18
+Scenario
+Hybrid Search कब उपयोग करनी चाहिए?
+Interviewer क्या Check कर रहा है?
+Semantic + Keyword Search
+Answer
+मान लीजिए User पूछता है
+HTTP 404
+
+या
+PHP 8.4
+
+या
+Invoice-1001
+
+ये Exact Terms हैं।
+Keyword Search बेहतर रहेगी।
+लेकिन
+अगर User पूछे
+Vehicle
+
+और Document में लिखा हो
+Car
+
+तो
+Semantic Search बेहतर रहेगी।
+इसलिए
+Production में
+Hybrid Search
+सबसे अच्छा विकल्प होती है।
+Interview Answer
+"Exact Keywords के लिए Keyword Search और Meaning आधारित Queries के लिए Semantic Search बेहतर होती है। इसलिए Hybrid Search दोनों का संयोजन है।"
+
+Question 19
+Scenario
+Chunk के साथ
+Page Number
+Store क्यों करते हैं?
+Interviewer क्या Check कर रहा है?
+Metadata Importance
+Answer
+मान लीजिए
+LLM ने Answer दिया
+अब User पूछता है
+यह Information कहाँ से आई?
+
+अगर Page Number Store है
+तो
+Source
+
+Employee Handbook
+
+Page 42
+
+दिखा सकते हैं।
+इसके अलावा
+- Citation
+- Audit
+- Trust
+- Explainability
+में भी उपयोग होता है।
+Interview Answer
+"Page Number Source Citation और Explainability के लिए बहुत महत्वपूर्ण Metadata है।"
+
+Question 20
+Scenario
+पहले आपने
+OpenAI Embedding Model
+से सारे Vectors बनाए।
+अब आपने
+BGE
+या
+E5
+Embedding Model पर Switch कर लिया।
+क्या पुराने Vectors Use कर सकते हैं?
+Interviewer क्या Check कर रहा hai?
+Embedding Compatibility
+Answer
+नहीं।
+हर Embedding Model
+अलग Vector Space बनाता है।
+उदाहरण
+Model A
+[0.23, 0.55, ...]
+
+Model B
+[0.91, -0.12, ...]
+
+इन दोनों की तुलना नहीं की जा सकती।
+इसलिए
+पूरा Vector Database
+Re-Embed करना पड़ेगा।
+Interview Answer
+"Embedding Model बदलने पर पुराने Vectors Compatible नहीं रहते। इसलिए सभी Documents को नए Model से दोबारा Embed करके Index बनाना पड़ता है।"
+
+------------------------------------------------------------------------------------------
+Question 21
+Scenario
+Retriever ने Top-5 Chunks निकाले:
+Chunk A
+Chunk B
+Chunk C
+Chunk D
+Chunk E
+
+लेकिन सबसे Relevant Chunk तीसरे नंबर पर है।
+क्या LLM को ऐसे ही भेज देंगे?
+Interviewer क्या Check कर रहा है?
+- Reranker की समझ
+- Retrieval Pipeline
+Answer
+नहीं।
+पहले Reranker का उपयोग करेंगे।
+Flow:
+User Query
+      ↓
+Retriever (Top-20)
+      ↓
+Reranker
+      ↓
+Best Top-5
+      ↓
+LLM
+
+Retriever तेज़ होता है लेकिन Approximate Results देता है।
+Reranker थोड़ा Slow होता है लेकिन अधिक Accurate Ranking करता है।
+Interview Answer
+"Retriever Candidate Chunks लाता है, जबकि Reranker उन्हें Query के अनुसार दोबारा Rank करता है ताकि सबसे Relevant Context LLM तक पहुँचे।"
+
+Follow-up
+Interviewer पूछ सकता है
+Retriever और Reranker में सबसे बड़ा Difference?
+
+Answer
+Retriever
+✅ Fast
+❌ Approximate
+Reranker
+❌ Slow
+✅ Highly Accurate
+Question 22
+Scenario
+दो PDFs हैं।
+PDF A
+Annual Leave = 20 Days
+
+PDF B
+Annual Leave = 25 Days
+
+User पूछता है
+Annual Leave कितनी है?
+
+Interviewer क्या Check कर रहा है?
+Conflicting Knowledge Handling
+Answer
+LLM को केवल एक PDF नहीं देनी चाहिए।
+दोनों Relevant Chunks Retrieve होंगे।
+फिर Answer
+Document A के अनुसार
+
+20 Days
+
+लेकिन
+
+Document B के अनुसार
+
+25 Days
+
+दोनों Documents में अंतर है।
+
+अगर Metadata है
+तो
+Source भी दिखाना चाहिए।
+Interview Answer
+"Conflicting Information होने पर RAG को दोनों Sources दिखाने चाहिए और Conflict स्पष्ट करना चाहिए। LLM को अपनी तरफ से Guess नहीं करना चाहिए।"
+
+Question 23
+Scenario
+आपके पास
+1000 Tokens का Paragraph है।
+अगर इसे Embed करेंगे
+तो Retrieval कमजोर हो सकती है।
+अगर
+100 Tokens में तोड़ेंगे
+तो Context टूट सकता है।
+Solution?
+Interviewer क्या Check कर रहा है?
+Parent-Child Retrieval
+Answer
+Parent-Child Retrieval
+दो तरह के Chunks बनाता है।
+Child Chunk
+100 Tokens
+
+Parent Chunk
+1000 Tokens
+
+Search
+Child पर होगी।
+लेकिन
+LLM को
+Parent भेजा जाएगा।
+इससे
+Accuracy भी रहेगी
+और Context भी।
+Interview Answer
+"Parent-Child Retrieval छोटे Chunks से Accurate Retrieval और बड़े Parent Chunk से पूरा Context दोनों उपलब्ध कराता है।"
+
+Question 24
+Scenario
+LLM को
+50 Pages का Context भेज दिया।
+लेकिन
+बीच में जो सबसे Important जानकारी थी
+वह Ignore हो गई।
+ऐसा क्यों?
+Interviewer क्या Check कर रहा है?
+Lost in the Middle Problem
+Answer
+Research में देखा गया है
+LLMs
+सबसे ज्यादा ध्यान देते हैं
+- शुरुआत पर
+- अंत पर
+लेकिन
+बीच का Context
+कई बार Ignore कर देते हैं।
+इसे कहते हैं
+Lost in the Middle
+Solution
+- Best Chunk पहले रखें।
+- Reranking करें।
+- Context Compress करें।
+- Unnecessary Chunks हटाएँ।
+Interview Answer
+"LLMs लंबे Context के बीच वाले हिस्से को कम महत्व दे सकते हैं। इसलिए Relevant Chunks की Ordering और Context Optimization जरूरी है।"
+
+Question 25
+Scenario
+User पूछता है
+Product X किस Team ने बनाया और उस Team का Manager कौन है?
+
+Document A
+Product X → Team Alpha
+
+Document B
+Team Alpha → Manager Raj
+
+कोई भी Document पूरा Answer नहीं देता।
+अब?
+Interviewer क्या Check कर रहा है?
+Multi-Hop Retrieval
+Answer
+Single Retrieval से Answer नहीं मिलेगा।
+System को
+पहले
+Product X
+↓
+Team Alpha
+निकालना होगा।
+फिर
+Team Alpha
+↓
+Raj
+निकालना होगा।
+यानी
+Multiple Retrieval Steps।
+इसे कहते हैं
+Multi-Hop Retrieval
+Interview Answer
+"जब Answer कई Documents में फैला हो और उन्हें जोड़ना पड़े, तब Multi-Hop Retrieval उपयोग किया जाता है।"
+
+Question 26
+Scenario
+Company रोज़ Policy Update करती है।
+क्या रोज़
+पूरे Database को Re-Embed करेंगे?
+Interviewer क्या Check कर रहा है?
+Incremental Indexing
+Answer
+नहीं।
+सिर्फ
+जो Document बदला है
+उसी का
+Embedding Update करेंगे।
+बाकी Documents
+वैसे ही रहेंगे।
+इसे कहते हैं
+Incremental Indexing
+Interview Answer
+"Production Systems में केवल बदले हुए Documents को Re-Embed किया जाता है ताकि Time और Cost दोनों बचें।"
+
+Question 27
+Scenario
+Retriever को
+कोई Relevant Chunk
+मिला ही नहीं।
+अब LLM क्या करे?
+Interviewer क्या Check कर रहा है?
+Hallucination Handling
+Answer
+गलत तरीका
+LLM
+अपनी Knowledge से Answer बना दे।
+सही तरीका
+मुझे उपलब्ध Documents में
+इस प्रश्न का उत्तर नहीं मिला।
+
+या
+कृपया और जानकारी दें।
+
+Production Systems
+Confidence Threshold रखते हैं।
+अगर Similarity कम हो
+तो
+No Answer Return करते हैं।
+Interview Answer
+"अगर Retrieval में Relevant Context नहीं मिलता, तो System को Hallucinate नहीं करना चाहिए बल्कि स्पष्ट रूप से बताना चाहिए कि पर्याप्त जानकारी उपलब्ध नहीं है।"
+
+Question 28
+Scenario
+पहले
+768 Dimension
+का Embedding Model था।
+अब
+1536 Dimension
+का Model Use कर रहे हैं।
+क्या पुराने Vector Database में Insert कर देंगे?
+Interviewer क्या Check kar raha hai?
+Vector Compatibility
+Answer
+नहीं।
+Vector Database
+Same Dimension Expect करता है।
+768
+और
+1536
+की तुलना नहीं हो सकती।
+इसलिए
+नया Index
+बनाना पड़ेगा।
+Interview Answer
+"Embedding Dimension बदलने पर नया Vector Index बनाना पड़ता है क्योंकि पुराने और नए Vectors आपस में Compatible नहीं होते।"
+
+Question 29
+Scenario
+User केवल लिखता है
+Salary
+
+इतना ही।
+अब Retrieval कैसे Improve करेंगे?
+Interviewer क्या Check कर रहा है?
+Query Rewriting
+Answer
+System
+User Query को Rewrite करेगा।
+Salary
+
+↓
+Salary Policy
+
+Employee Salary
+
+Salary Revision
+
+Salary Structure
+
+Payroll Rules
+
+अब Retrieval बेहतर होगी।
+Interview Answer
+"Short या Ambiguous Queries को Query Rewriting के माध्यम से अधिक स्पष्ट बनाकर Retrieval की Quality बढ़ाई जाती है।"
+
+Question 30
+Scenario
+Company कहती है
+Response 1 Second के अंदर चाहिए।
+
+लेकिन
+Accuracy भी कम नहीं होनी चाहिए।
+आप क्या करेंगे?
+Interviewer क्या Check कर रहा है?
+Production Optimization
+Answer
+मैं कई Techniques उपयोग करूँगा।
+1.
+Metadata Filtering
+↓
+कम Documents Search होंगे।
+2.
+Top-K Optimize
+↓
+Top-20 की जगह
+Top-5
+3.
+Hybrid Search
+↓
+Accuracy बढ़ेगी।
+4.
+Caching
+↓
+Repeated Questions Fast होंगे।
+5.
+Incremental Indexing
+↓
+बार-बार Re-Embedding नहीं होगी।
+6.
+Fast Vector Index
+जैसे
+- HNSW
+- IVF (Use case के अनुसार)
+7.
+Reranker
+केवल Top-20 पर चलाएँ
+पूरे Database पर नहीं।
+Interview Answer
+"Low Latency और High Accuracy के लिए Metadata Filtering, Optimized Top-K, Hybrid Search, Caching, Efficient Vector Index और Selective Reranking जैसी Techniques का संयोजन उपयोग किया जाता है।"
+
+------------------------------------------------------------------------------------------------
+
+Question 31
+Scenario
+User पूछता है:
+"2023 की Leave Policy और 2025 की Leave Policy में क्या अंतर है?"
+
+दोनों अलग-अलग Documents में हैं।
+क्या सामान्य RAG पर्याप्त होगा?
+Interviewer क्या Check कर रहा है?
+- Multi-Document Comparison
+- Reasoning Ability
+Answer
+सिर्फ एक Chunk Retrieve करना पर्याप्त नहीं होगा।
+System को:
+1. 2023 Policy Retrieve करनी होगी।
+2. 2025 Policy Retrieve करनी होगी।
+3. दोनों को Compare करना होगा।
+4. Difference Generate करना होगा।
+Example
+2023
+
+Annual Leave = 20 Days
+
+------------------------
+
+2025
+
+Annual Leave = 25 Days
+
+------------------------
+
+Difference
+
+Annual Leave 20 से बढ़कर 25 हो गई।
+
+Interview Answer
+"Comparison वाले Questions में Multiple Relevant Documents Retrieve करके LLM से Comparative Reasoning करानी पड़ती है।"
+
+Question 32
+Scenario
+User पूछता है
+"Employee Leave Policy क्या है?"
+
+लेकिन Documents में
+Leave Policy
+
+Holiday Policy
+
+Sick Leave
+
+Maternity Leave
+
+सब कुछ मौजूद है।
+केवल एक Query Search पर्याप्त है?
+Interviewer क्या Check कर रहा है?
+Multi Query Retrieval
+Answer
+Production Systems कई Queries बनाते हैं।
+Example
+Employee Leave Policy
+
+↓
+
+Annual Leave
+
+↓
+
+Paid Leave
+
+↓
+
+Leave Rules
+
+↓
+
+Vacation Policy
+
+फिर
+सभी Results Merge करते हैं।
+इससे Recall बढ़ जाती है।
+Interview Answer
+"Multi Query Retrieval अलग-अलग तरीकों से Query बनाकर अधिक Relevant Results प्राप्त करता है।"
+
+Question 33
+Scenario
+तीन अलग-अलग Retrievers हैं।
+Retriever A
+Chunk 5
+
+Chunk 11
+
+Chunk 80
+
+Retriever B
+Chunk 11
+
+Chunk 22
+
+Chunk 90
+
+Retriever C
+Chunk 22
+
+Chunk 5
+
+Chunk 17
+
+अब Final Result कैसे चुनेंगे?
+Interviewer क्या Check कर रहा है?
+RRF (Reciprocal Rank Fusion)
+Answer
+हर Retriever अलग Strength रखता है।
+RRF सभी की Ranking को Combine करता है।
+जिस Chunk की Overall Ranking अच्छी होगी
+उसे ऊपर रखा जाएगा।
+इससे
+Single Retriever की Weakness कम हो जाती है।
+Interview Answer
+"Reciprocal Rank Fusion कई Retrievers के Results को उनकी Ranking के आधार पर Combine करता है, जिससे Overall Retrieval Quality बेहतर होती है।"
+
+Question 34
+Scenario
+LLM का Context Window
+128K Tokens है।
+तो क्या पूरा Document भेज देना चाहिए?
+Interviewer क्या Check कर रहा है?
+Context Management
+Answer
+नहीं।
+बड़ा Context होने का मतलब यह नहीं कि पूरा Document भेज दें।
+Problems
+- Cost बढ़ेगी।
+- Latency बढ़ेगी।
+- Lost in the Middle बढ़ेगा।
+- Noise बढ़ेगा।
+हमेशा
+Relevant Context
+ही भेजना चाहिए।
+Interview Answer
+"Large Context Window सुविधा है, लेकिन Retrieval की आवश्यकता समाप्त नहीं करती। केवल Relevant Context भेजना ही सर्वोत्तम Practice है।"
+
+Question 35
+Scenario
+User पूछता है
+Company में Promotion कैसे होता है?
+
+लेकिन
+Answer
+10 अलग-अलग Chunks में फैला हुआ है।
+क्या सभी Chunks भेज देंगे?
+Interviewer क्या Check कर रहा है?
+Context Compression
+Answer
+नहीं।
+पहले
+Context Compress करेंगे।
+यानि
+10 Chunks
+↓
+2–3 Summary Chunks
+↓
+LLM
+इससे
+Speed
+Cost
+Context Window
+तीनों बेहतर होंगे।
+Interview Answer
+"Context Compression का उद्देश्य Relevant Information को बनाए रखते हुए Context का Size कम करना है।"
+
+Question 36
+Scenario
+PDF में
+Employee
+↓
+Manager
+↓
+Department
+↓
+Company
+का पूरा Relationship है।
+क्या Normal RAG पर्याप्त होगा?
+Interviewer क्या Check कर रहा है?
+GraphRAG
+Answer
+अगर केवल
+Semantic Search करेंगे
+तो
+Relationships Miss हो सकते हैं।
+GraphRAG
+Nodes
+Employee
+
+Manager
+
+Department
+
+Edges
+Works Under
+
+Belongs To
+
+Reports To
+
+इन Relationships को Store करता है।
+इसलिए
+Complex Questions
+बेहतर Solve होते हैं।
+Interview Answer
+"Relationship आधारित Queries के लिए GraphRAG सामान्य Vector Search से अधिक प्रभावी होता है।"
+
+Question 37
+Scenario
+User पूछता है
+Raj किस Department में है?
+
+फिर
+उस Department का Manager कौन है?
+
+फिर
+उसकी Team में कितने लोग हैं?
+
+क्या हर बार शुरुआत से Retrieval करेंगे?
+Interviewer क्या Check कर रहा है?
+Conversational RAG
+Answer
+नहीं।
+Conversation History
+Use करेंगे।
+System समझेगा
+"उस Department"
+का मतलब
+पहले वाले Answer का Department।
+Interview Answer
+"Conversational RAG में Conversation Memory का उपयोग करके Follow-up Questions को सही Context में समझा जाता है।"
+
+Question 38
+Scenario
+आपको कैसे पता चलेगा कि
+Retriever अच्छा काम कर रहा है?
+Interviewer क्या Check कर रहा है?
+Evaluation Metrics
+Answer
+केवल User Feedback पर्याप्त नहीं।
+Metrics Use करेंगे।
+जैसे
+- Recall@K
+- Precision@K
+- Hit Rate
+- MRR
+- NDCG
+अगर
+Relevant Chunk
+Top-5 में आ रहा है
+तो Retrieval अच्छा है।
+Interview Answer
+"Retriever की Quality को Recall@K, Precision@K और अन्य Retrieval Metrics से मापा जाता है।"
+
+Question 39
+Scenario
+LLM ने सही Answer दिया।
+लेकिन
+Source गलत दिखा दिया।
+क्या यह Problem है?
+Interviewer क्या Check कर रहा hai?
+Groundedness
+Citation
+Answer
+हाँ।
+Production में
+Answer
+और
+Citation
+दोनों सही होने चाहिए।
+गलत Source
+Trust कम कर देता है।
+Interview Answer
+"Correct Answer के साथ Correct Citation भी आवश्यक है। Enterprise Systems में Explainability और Auditability बहुत महत्वपूर्ण होती हैं।"
+
+Question 40
+Scenario
+User पूछता है
+Company के CEO की Salary कितनी है?
+
+लेकिन
+Document में Answer मौजूद नहीं।
+LLM को Internet से पता है।
+अब क्या करे?
+Interviewer क्या Check कर रहा है?
+Grounded RAG
+Answer
+अगर System
+Document-based RAG है
+तो
+LLM को
+Internet Knowledge
+Use नहीं करनी चाहिए।
+उसे कहना चाहिए
+मुझे उपलब्ध Documents में
+इस प्रश्न का उत्तर नहीं मिला।
+
+यही
+Grounded Response
+है।
+Interview Answer
+"Document Grounded RAG में Answer केवल Retrieved Context पर आधारित होना चाहिए। यदि जानकारी उपलब्ध नहीं है, तो System को स्पष्ट रूप से यह बताना चाहिए, न कि Model की Internal Knowledge का उपयोग करना चाहिए।"
+
+------------------------------------------------------------------------------------------------------
+
+Question 41
+Scenario
+User पूछता है
+"Python में Readonly Property क्या होती है?"
+
+Retriever ने गलत Chunks ला दिए।
+अब क्या करें?
+Interviewer क्या Check कर रहा है?
+Corrective RAG (CRAG)
+Answer
+सामान्य RAG में
+User
+ ↓
+Retrieve
+ ↓
+LLM
+ ↓
+Answer
+
+लेकिन CRAG में
+User
+ ↓
+Retrieve
+ ↓
+Retriever Quality Check
+ ↓
+अगर Retrieval खराब है
+ ↓
+Re-search / Web Search / Alternate Retrieval
+ ↓
+LLM
+
+यानी
+System पहले जांचता है कि Retrieval अच्छी है या नहीं।
+अगर नहीं
+तो दोबारा Search करता है।
+Interview Answer
+"CRAG Retrieval की Quality Verify करता है। अगर Retrieved Context कमजोर हो तो System दोबारा बेहतर Context खोजता है।"
+
+Question 42
+Scenario
+User पूछता है
+"Python में Decorator और Context Manager में क्या Difference है?"
+
+लेकिन Question बहुत Complex है।
+क्या एक ही Retrieval पर्याप्त है?
+Interviewer क्या Check कर रहा है?
+Agentic RAG
+Answer
+नहीं।
+Agentic RAG
+Question को छोटे Tasks में Divide करता है।
+Main Question
+
+↓
+
+Decorator
+
+↓
+
+Context Manager
+
+↓
+
+Comparison
+
+↓
+
+Final Answer
+
+यानी
+Agent खुद Decide करता है
+कितनी Retrieval करनी है।
+Interview Answer
+"Agentic RAG Complex Questions को छोटे Steps में बाँटकर Multiple Retrieval और Reasoning करता है।"
+
+Question 43
+Scenario
+Retriever ने
+Top-5 Chunks
+निकाले।
+LLM को लगता है
+Answer पूरा नहीं है।
+अब?
+Interviewer क्या Check कर रहा है?
+Self-RAG
+Answer
+Self-RAG
+खुद अपना Answer Evaluate करता है।
+अगर लगता है
+Context कम है
+तो
+फिर से Retrieval करता है।
+Flow
+Retrieve
+
+↓
+
+Answer
+
+↓
+
+Self Evaluation
+
+↓
+
+Need More Context?
+
+↓
+
+Yes
+
+↓
+
+Retrieve Again
+
+Interview Answer
+"Self-RAG LLM को अपनी Response की गुणवत्ता जांचने और आवश्यकता होने पर दोबारा Retrieval करने की क्षमता देता है।"
+
+Question 44
+Scenario
+आपके पास
+1 करोड़ Documents
+हैं।
+क्या हर Query पर
+सभी Documents Search करेंगे?
+Interviewer क्या Check कर रहा है?
+Scalability
+Answer
+नहीं।
+Production में
+पहले
+Metadata Filter
+फिर
+Retriever
+फिर
+Reranker
+Use होगा।
+Example
+Country = India
+
+↓
+
+Department = HR
+
+↓
+
+Year = 2025
+
+↓
+
+Vector Search
+
+इससे
+Search Space
+बहुत कम हो जाती है।
+Interview Answer
+"Large Scale Systems में पहले Search Space को Metadata Filtering से कम किया जाता है, उसके बाद ही Vector Retrieval किया जाता है।"
+
+Question 45
+Scenario
+Embedding Model
+2024 में Train हुआ था।
+आज
+2026 है।
+नई Technologies आ गई हैं।
+Problem?
+Interviewer क्या Check कर रहा है?
+Embedding Drift
+Answer
+पुराना Embedding Model
+नई Terms
+अच्छी तरह नहीं समझेगा।
+Example
+2024 में
+नई Framework
+मौजूद ही नहीं थी।
+इसलिए
+Embedding Quality
+कम हो सकती है।
+समय-समय पर
+Embedding Model Upgrade
+करना चाहिए।
+Interview Answer
+"नई Domain Knowledge आने पर पुराने Embedding Models की Semantic Quality घट सकती है। इसे Embedding Drift कहते हैं।"
+
+Question 46
+Scenario
+FAISS
+Pinecone
+Qdrant
+Milvus
+इनमें कैसे चुनेंगे?
+Interviewer क्या Check कर रहा है?
+Vector Database Selection
+Answer
+FAISS
+✅ Local
+✅ Fast
+❌ Distributed नहीं
+Pinecone
+✅ Managed Service
+✅ Scaling आसान
+❌ Paid
+Qdrant
+✅ Open Source
+✅ Excellent Filtering
+Milvus
+✅ Billion Scale
+✅ Enterprise
+Interview Answer
+"Vector Database का चयन Deployment Model, Scale, Filtering, Cost और Operational Requirements के आधार पर किया जाता है।"
+
+Question 47
+Scenario
+Million Vectors हैं।
+Linear Search करेंगे?
+Interviewer क्या Check कर रहा है?
+ANN Search
+Answer
+नहीं।
+Approximate Nearest Neighbor
+Algorithms
+Use होंगे।
+जैसे
+HNSW
+Fast
+High Accuracy
+IVF
+Fast
+Memory Efficient
+PQ
+Memory कम
+लेकिन Accuracy थोड़ी कम।
+Interview Answer
+"Large Scale Vector Search के लिए Exact Search की बजाय ANN Algorithms जैसे HNSW या IVF उपयोग किए जाते हैं।"
+
+Question 48
+Scenario
+User पूछता है
+Explain Python.
+
+Document
+500 Pages का है।
+क्या पूरा Embed करेंगे?
+Interviewer क्या Check कर रहा है?
+Hierarchical Retrieval (RAPTOR जैसी सोच)
+Answer
+नहीं।
+पहले
+Document का Tree बनाएँगे।
+Python
+
+↓
+
+Syntax
+
+↓
+
+Functions
+
+↓
+
+Classes
+
+↓
+
+Decorators
+
+User पूछे
+Decorators
+तो
+पूरा Document नहीं
+केवल
+Decorator वाला Branch Retrieve होगा।
+Interview Answer
+"Hierarchical Retrieval Document को Tree Structure में व्यवस्थित करता है ताकि केवल संबंधित भाग Retrieve किया जाए।"
+
+Question 49
+Scenario
+User पूछता है
+PHP Readonly Property
+
+लेकिन
+Retriever बार-बार
+Readonly Classes
+Retrieve कर रहा है।
+क्यों?
+Interviewer क्या Check कर रहा है?
+Embedding Limitation
+Answer
+Embedding
+Semantic Similarity
+देखती है।
+Readonly Property
+और
+Readonly Class
+काफी Similar हो सकते हैं।
+Solution
+- Hybrid Search
+- Better Reranker
+- Query Rewriting
+- Metadata
+- Domain-specific Embeddings
+Interview Answer
+"Semantic Search में समान Concepts कभी-कभी Confuse हो सकते हैं। ऐसे मामलों में Hybrid Search और Reranking Accuracy बढ़ाते हैं।"
+
+Question 50 ⭐⭐⭐⭐⭐
+Final Scenario
+Interviewer पूछता है
+अगर आपको Zero से Production RAG बनाना हो तो पूरा Architecture बताइए।
+
+Interviewer क्या Check कर रहा है?
+Overall RAG Knowledge
+Answer
+पूरा Flow
+User Query
+      │
+      ▼
+Query Preprocessing
+(Query Rewrite, Expansion)
+      │
+      ▼
+Metadata Filtering
+      │
+      ▼
+Hybrid Retrieval
+(Vector + Keyword)
+      │
+      ▼
+Top-K Retrieval
+      │
+      ▼
+Reranker
+      │
+      ▼
+Context Compression
+      │
+      ▼
+Prompt Builder
+(System Prompt + Context)
+      │
+      ▼
+LLM
+      │
+      ▼
+Grounded Answer
+      │
+      ▼
+Citation
+      │
+      ▼
+Feedback Collection
+      │
+      ▼
+Evaluation
+
+Production में
+Monitoring भी होगी।
+जैसे
+- Latency
+- Recall
+- Cost
+- Hallucination Rate
+- User Feedback
+Interview Answer
+"Production RAG केवल Retrieval और LLM तक सीमित नहीं है। इसमें Query Processing, Hybrid Retrieval, Reranking, Context Optimization, Grounding, Citation, Monitoring और Continuous Evaluation सभी महत्वपूर्ण भाग होते हैं।"
+
+-------------------------------------------------------------------------------------------------
+
+
+maine above kuch interview questions diya hua hai jo ki rag se related hai, isme questions aur answers dono hai, to hume iska PWA application chahiye, aur isme jo ye part hai:
+Interviewer क्या Check कर रहा है?
+ye remove kar dena ye nahi chaiye, 
+
+I think you have understand ki muujhe kya chahiye, aur ha left side question hona chaiye aur right side answer aur ye dark/ligth themes me hona chahiye with better color combination
+I am trhing to add additional details below.
+maine yaha 2 example de raha hu niche jo ki maine already banaya hua hai aur yahi pe hume host bhi karna hai, aur folder ka naam hoga rag-scenario
+
+1. https://shubhamverma.online/ai/
+2. https://shubhamverma.online/flask/
+
+Note 1: ager ho sake to khud se bhi kuch important interview quesiton add kar do taki main proper preperation kar saku jo ki beginner level se experience level tak hona cahiye.
+Note 2: aur haa isme, search (with cross or clear in seach box), expend all, collapse all, mobile/all device compatibility means responsive, aur bhi feature khus se add kar dena ager ho sake to.
+I hope ki mera requirement clear hai aur mujhe vo mil jaye jo main chahta hu.

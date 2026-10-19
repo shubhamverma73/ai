@@ -1,0 +1,15 @@
+{
+  "name": "FastAPI Interview Handbook",
+  "short_name": "FastAPI",
+  "description": "FastAPI Interview Preparation Handbook - English Questions, Hindi Answers",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#000000",
+  "theme_color": "#009485",
+  "icons": [
+    { "src": "icons/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "icons/icon-maskable.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" }
+  ]
+}

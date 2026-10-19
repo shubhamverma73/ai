@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Markdown Studio Pro</title>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/styles/github-dark.min.css" id="hljs-theme">
+<script src="https://cdn.jsdelivr.net/npm/highlight.js@11.9.0/lib/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/html2pdf.js@0.10.1/dist/html2pdf.bundle.min.js"></script>
+
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="logo">📘</span>
+    <span class="brand-text">Markdown Studio Pro</span>
+  </div>
+
+  <div class="toolbar">
+    <button class="tbtn" id="btnOpenFile" title="Open File (Ctrl+O)">📂 Open</button>
+    <button class="tbtn" id="btnPaste" title="Paste Markdown (Ctrl+Shift+V)">📋 Paste</button>
+    <button class="tbtn" id="btnUrl" title="Load from URL">🌐 URL</button>
+    <button class="tbtn" id="btnGithub" title="Load GitHub README">🐙 GitHub</button>
+    <span class="sep"></span>
+    <button class="tbtn" id="btnEditorToggle" title="Toggle Live Editor (Ctrl+E)">✍ Editor</button>
+    <button class="tbtn" id="btnSplit" title="Split View (Ctrl+\\)">🪟 Split</button>
+    <button class="tbtn" id="btnBeautify" title="Beautify Markdown">✨ Beautify</button>
+    <span class="sep"></span>
+    <button class="tbtn" id="btnSearch" title="Search (Ctrl+F)">🔍 Search</button>
+    <button class="tbtn" id="btnToc" title="Toggle TOC (Ctrl+T)">📑 TOC</button>
+    <span class="sep"></span>
+    <button class="tbtn" id="btnExportHtml" title="Export HTML">📄 HTML</button>
+    <button class="tbtn" id="btnExportPdf" title="Export PDF">📄 PDF</button>
+    <button class="tbtn" id="btnPrint" title="Print (Ctrl+P)">🖨 Print</button>
+    <button class="tbtn" id="btnDownloadMd" title="Download README.md">💾 .md</button>
+    <button class="tbtn" id="btnCopyMd" title="Copy Markdown">📋 MD</button>
+    <button class="tbtn" id="btnCopyHtml" title="Copy HTML">📋 HTML</button>
+    <span class="sep"></span>
+    <button class="tbtn" id="btnFullscreen" title="Fullscreen (F11)">⛶ Full</button>
+    <button class="tbtn" id="btnTheme" title="Toggle Theme (Ctrl+D)">🌙 Theme</button>
+  </div>
+</header>
+
+<div class="progress-wrap">
+  <div class="progress-bar" id="readingProgress"></div>
+</div>
+
+<div class="app-shell">
+
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-head">
+      <span>📑 Table of Contents</span>
+      <button class="icon-btn" id="btnCloseSidebar">✖</button>
+    </div>
+    <div class="sidebar-search">
+      <input type="text" id="searchInput" placeholder="🔍 Search in document...">
+      <div class="search-meta" id="searchMeta"></div>
+    </div>
+    <nav class="toc" id="tocList"></nav>
+    <div class="sidebar-stats" id="statsBox">
+      <div>Words: <span id="wordCount">0</span></div>
+      <div>Characters: <span id="charCount">0</span></div>
+      <div>Lines: <span id="lineCount">0</span></div>
+      <div>Reading time: <span id="readTime">0 min</span></div>
+    </div>
+  </aside>
+
+  <main class="split-layout" id="splitLayout">
+    <section class="pane editor-pane" id="editorPane" style="display:none;">
+      <div class="pane-head">✍ Editor</div>
+      <textarea id="mdEditor" spellcheck="false" placeholder="# Start typing markdown...">
+# Welcome to Markdown Studio Pro
+
+Drop a `.md` file, paste content, or load from a URL / GitHub repo.
+
+## Features
+- Live preview
+- Mermaid diagrams
+- KaTeX math: $E = mc^2$
+- Syntax highlighted code
+
+```js
+console.log("Hello Markdown Studio Pro");
+```
+</textarea>
+    </section>
+
+    <div class="resizer" id="resizer"></div>
+
+    <section class="pane preview-pane" id="previewPane">
+      <div class="pane-head">👀 Preview</div>
+      <article class="markdown-body" id="preview"></article>
+    </section>
+  </main>
+</div>
+
+<div class="drop-overlay" id="dropOverlay">
+  <div class="drop-box">📂 Drop your Markdown file here</div>
+</div>
+
+<div class="modal-backdrop" id="pasteModalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span>📋 Paste Markdown</span>
+      <button class="icon-btn" id="closePasteModal">✖</button>
+    </div>
+    <div class="modal-body">
+      <textarea id="pasteArea" placeholder="Paste your markdown text here..."></textarea>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="cancelPaste">Cancel</button>
+      <button class="btn-primary" id="confirmPaste">Render</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="urlModalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span>🌐 Load from URL</span>
+      <button class="icon-btn" id="closeUrlModal">✖</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="urlInput" placeholder="https://raw.githubusercontent.com/user/repo/main/README.md">
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="cancelUrl">Cancel</button>
+      <button class="btn-primary" id="confirmUrl">Load</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="githubModalBackdrop">
+  <div class="modal">
+    <div class="modal-head">
+      <span>🐙 Load GitHub Repository README</span>
+      <button class="icon-btn" id="closeGithubModal">✖</button>
+    </div>
+    <div class="modal-body">
+      <input type="text" id="githubInput" placeholder="owner/repo  e.g. facebook/react">
+      <div class="hint">Branch (optional, default: main):</div>
+      <input type="text" id="githubBranch" placeholder="main">
+    </div>
+    <div class="modal-foot">
+      <button class="btn-secondary" id="cancelGithub">Cancel</button>
+      <button class="btn-primary" id="confirmGithub">Load README</button>
+    </div>
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept=".md,.markdown,.txt" hidden>
+
+<div class="toast" id="toast"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
+
